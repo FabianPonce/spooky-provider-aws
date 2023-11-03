@@ -3,7 +3,7 @@
 
 # Visit https://goreleaser.com for documentation on how to customize this
 # behavior.
-project_name: spookyaws
+project_name: terraform-provider-spookyaws
 before:
   hooks:
     # this is just an example and not a requirement for provider building/publishing
@@ -24,8 +24,6 @@ builds:
       - darwin
     goarch:
       - amd64
-      - '386'
-      - arm
       - arm64
     ignore:
       - goos: darwin
